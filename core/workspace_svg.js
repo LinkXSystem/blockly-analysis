@@ -574,6 +574,9 @@ Blockly.WorkspaceSvg.prototype.newBlock = function(prototypeName, opt_id) {
 };
 
 /**
+ * @description 添加垃圾桶， 是否可以通过此来完成项目切换的时候清洗呢？
+ */
+/**
  * Add a trashcan.
  * @package
  */
@@ -584,6 +587,9 @@ Blockly.WorkspaceSvg.prototype.addTrashcan = function() {
   this.svgGroup_.insertBefore(svgTrashcan, this.svgBlockCanvas_);
 };
 
+/**
+ * @description 添加控制组件
+ */
 /**
  * Add zoom controls.
  * @package
@@ -645,6 +651,9 @@ Blockly.WorkspaceSvg.prototype.getFlyout_ = function() {
   return null;
 };
 
+/**
+ * @description 获取对应工作区间的 Toolbox
+ */
 /**
  * Getter for the toolbox associated with this workspace, if one exists.
  * @return {Blockly.Toolbox} The toolbox on this workspace.

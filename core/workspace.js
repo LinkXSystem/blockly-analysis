@@ -575,6 +575,9 @@ Blockly.Workspace.prototype.hasBlockLimits = function() {
 };
 
 /**
+ * @description 控制 Blockly 的撤销和重做
+ */
+/**
  * Undo or redo the previous action.
  * @param {boolean} redo False if undo, true if redo.
  */
