@@ -160,6 +160,9 @@ Blockly.Options.prototype.parentWorkspace = null;
 Blockly.Options.prototype.setMetrics = null;
 
 /**
+ * 为啥默认是 null ?
+ */
+/**
  * Return an object with the metrics required to size the workspace.
  * @return {Object} Contains size and position metrics, or null.
  */

@@ -37,7 +37,10 @@ goog.require('Blockly.WorkspaceDragSurfaceSvg');
 goog.require('goog.ui.Component');
 goog.require('goog.userAgent');
 
-
+/**
+ * @description 用于初始化 Blockly 的工作区间, 需要注意生成的 Blockly.WorkspaceSvg 的实例
+ * @document Blockly.WorkspaceSvg 的文档: https://developers.google.com/blockly/reference/js/Blockly.WorkspaceSvg
+ */
 /**
  * Inject a Blockly editor into the specified container element (usually a div).
  * @param {!Element|string} container Containing element, or its ID,
@@ -49,6 +52,7 @@ Blockly.inject = function(container, opt_options) {
   Blockly.checkBlockColourConstants();
 
   if (typeof container == 'string') {
+    // 传入容器的 ID
     container = document.getElementById(container) ||
         document.querySelector(container);
   }
@@ -56,6 +60,8 @@ Blockly.inject = function(container, opt_options) {
   if (!Blockly.utils.containsNode(document, container)) {
     throw Error('Error: container is not in current document.');
   }
+  // Blockly.Options 的文档: https://developers.google.com/blockly/reference/js/Blockly.Options
+  // 用于解析用户的配置
   var options = new Blockly.Options(opt_options || {});
   var subContainer = document.createElement('div');
   subContainer.className = 'injectionDiv';
@@ -67,6 +73,7 @@ Blockly.inject = function(container, opt_options) {
   var blockDragSurface = new Blockly.BlockDragSurfaceSvg(subContainer);
   var workspaceDragSurface = new Blockly.WorkspaceDragSurfaceSvg(subContainer);
 
+  // 创建工作区间
   var workspace = Blockly.createMainWorkspace_(svg, options, blockDragSurface,
       workspaceDragSurface);
   Blockly.setTheme(options.theme);
@@ -198,6 +205,9 @@ Blockly.createDom_ = function(container, options) {
 };
 
 /**
+ * @description 创建工作区间的主要函数
+ */
+/**
  * Create a main workspace and add it to the SVG.
  * @param {!Element} svg SVG element with pattern defined.
  * @param {!Blockly.Options} options Dictionary of options.
@@ -211,6 +221,7 @@ Blockly.createDom_ = function(container, options) {
 Blockly.createMainWorkspace_ = function(svg, options, blockDragSurface,
     workspaceDragSurface) {
   options.parentWorkspace = null;
+  // 注意 Blockly.Workspace 和 Blockly.WorkspaceSvg 是继承关系
   var mainWorkspace =
       new Blockly.WorkspaceSvg(options, blockDragSurface, workspaceDragSurface);
   mainWorkspace.scale = options.zoomOptions.startScale;
@@ -235,6 +246,7 @@ Blockly.createMainWorkspace_ = function(svg, options, blockDragSurface,
   if (!options.readOnly && !options.hasScrollbars) {
     var workspaceChanged = function(e) {
       if (!mainWorkspace.isDragging()) {
+        // 获取工作区间的视窗参数
         var metrics = mainWorkspace.getMetrics();
         var edgeLeft = metrics.viewLeft + metrics.absoluteLeft;
         var edgeTop = metrics.viewTop + metrics.absoluteTop;
@@ -295,6 +307,7 @@ Blockly.createMainWorkspace_ = function(svg, options, blockDragSurface,
         }
       }
     };
+    // addChangeListener 用于监听工作区间的变化
     mainWorkspace.addChangeListener(workspaceChanged);
   }
   // The SVG is now fully assembled.
@@ -304,6 +317,9 @@ Blockly.createMainWorkspace_ = function(svg, options, blockDragSurface,
   return mainWorkspace;
 };
 
+/**
+ * @description 用来挂载
+ */
 /**
  * Initialize Blockly with various handlers.
  * @param {!Blockly.Workspace} mainWorkspace Newly created main workspace.
