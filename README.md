@@ -1,17 +1,15 @@
-# Blockly [![Build Status]( https://travis-ci.org/google/blockly.svg?branch=master)](https://travis-ci.org/google/blockly)
+# Blockly 源码
 
+## Blockly 和 Scratch
 
-Google's Blockly is a web-based, visual programming editor.  Users can drag
-blocks together to build programs.  All code is free and open source.
+Blockly 是一款运行在网页客户端的 JavaScript 程式库，目的是用来打造视觉化程式设计语言，且同时附带编辑器。它是一项由谷歌根据 Apache2.0 许可的开放源码专案。常见被应用在网页浏览器中
 
-**The project page is https://developers.google.com/blockly/**
+目前而言, Blockly 依旧是值得学习的, 尽管在视觉化程式设计中, 目前更流行的 Scratch 3.0 的解决方法, 但是我们应该注意 [scratch-blocks](https://github.com/LLK/scratch-blocks) 中所说的这段话:
 
-![](https://developers.google.com/blockly/images/sample.png)
+> Scratch Blocks is a fork of Google's Blockly project that provides a design specification and codebase for building creative computing interfaces. Together with the Scratch Virtual Machine (VM) this codebase allows for the rapid design and development of visual programming interfaces. Unlike Blockly, Scratch Blocks does not use code generators, but rather leverages the Scratch Virtual Machine to create highly dynamic, interactive programming environments.
 
-Blockly has an active [developer forum](https://groups.google.com/forum/#!forum/blockly). Please drop by and say hello. Show us your prototypes early; collectively we have a lot of experience and can offer hints which will save you time.
+This project is in active development and should be considered a "developer preview" at this time.
 
-Help us focus our development efforts by telling us [what you are doing with
-Blockly](https://developers.google.com/blockly/registration). The questionnaire only takes
-a few minutes and will help us better support the Blockly community.
+是的, Scratch 3.0 中的主要组成为: scratch-blocks, scratch-vm, scratch-gui, 其中 scratch-blocks 是基于 blockly 重新实现的解决方案, 换一种意思, Scratch 3.0 是作为 Blockly 的框架出现的. 如果我们需要完成编程之后的动态展示, 那么 Scratch 3.0 不失为一个优秀的解决方案
 
-Want to contribute? Great! First, read [our guidelines for contributors](https://developers.google.com/blockly/guides/modify/contributing).
+## 源码文档
