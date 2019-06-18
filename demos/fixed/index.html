@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>Blockly Playground</title>
-    <script src="../../blockly_compressed.js"></script>
+    <script src="../../blockly_uncompressed.js"></script>
     <script src="../../blocks_compressed.js"></script>
     <script src="../../msg/js/en.js"></script>
     <style>
@@ -35,13 +35,17 @@
         box-shadow: 0 0 6px rgba(0, 0, 0, 0.12);
         background: #ffffff;
       }
+
+      .workspace {
+        margin-top: 64px;
+      }
     </style>
   </head>
   <body>
     <div class="header">
       <h3>Blockly Playground</h3>
     </div>
-    <div id="workspace"></div>
+    <div id="workspace" class="workspace"></div>
     <xml id="toolbox" style="display: none"> </xml>
 
     <script>
@@ -74,6 +78,22 @@
       // 配置实验的 block
       const blocks = [
         {
+          type: "start",
+          message0: "START %1 %2",
+          args0: [
+            {
+              type: "input_dummy"
+            },
+            {
+              type: "input_statement",
+              name: "do"
+            }
+          ],
+          colour: "#86C113",
+          tooltip: "",
+          helpUrl: ""
+        },
+        {
           type: "string_length",
           message0: "length of %1",
           args0: [
@@ -87,10 +107,6 @@
           colour: 160,
           tooltip: "Returns number of letters in the provided text."
         },
-        // {
-        //   type: "output_only",
-        //   output: "String"
-        // },
         {
           type: "color_picker",
           message0: "colour picker: %1",
@@ -162,7 +178,7 @@
       function initialWorkSpace() {
         const sence = document.querySelector("#workspace");
         sence.style.width = `${window.innerWidth}px`;
-        sence.style.height = `${window.innerHeight}px`;
+        sence.style.height = `${window.innerHeight - 64}px`;
 
         // 是否应全局
         registerBlock(blocks);
