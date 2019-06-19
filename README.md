@@ -13,3 +13,14 @@ This project is in active development and should be considered a "developer prev
 是的, Scratch 3.0 中的主要组成为: scratch-blocks, scratch-vm, scratch-gui, 其中 scratch-blocks 是基于 blockly 重新实现的解决方案, 换一种意思, Scratch 3.0 是作为 Blockly 的框架出现的. 如果我们需要完成编程之后的动态展示, 那么 Scratch 3.0 不失为一个优秀的解决方案
 
 ## 源码文档
+
+## Blockly 中的基础实体 (Class)
+
+- ToolBox
+  - 路径：`core/toolbox.js`
+- WorkSpace
+  - 路径：`core/workspace_svg.js`
+- WidgetDiv
+  - 路径：`core/widgetdiv.js`
+- Grid
+  - 路径：`core/grid.js`
