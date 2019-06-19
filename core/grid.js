@@ -31,7 +31,9 @@ goog.require('Blockly.utils');
 
 goog.require('goog.userAgent');
 
-
+/**
+ * @description 用于初始化 Blockly 的工作区间的栅栏样式
+ */
 /**
  * Class for a workspace's grid.
  * @param {!SVGElement} pattern The grid's SVG pattern, created during

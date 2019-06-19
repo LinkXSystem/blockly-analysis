@@ -71,7 +71,7 @@ Blockly.WorkspaceSvg = function(options,
       options.getMetrics || Blockly.WorkspaceSvg.getTopLevelWorkspaceMetrics_;
   this.setMetrics =
       options.setMetrics || Blockly.WorkspaceSvg.setTopLevelWorkspaceMetrics_;
-
+  // TODO: DB 内存数据库 ?-?
   Blockly.ConnectionDB.init(this);
 
   if (opt_blockDragSurface) {

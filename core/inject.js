@@ -66,6 +66,7 @@ Blockly.inject = function(container, opt_options) {
   var subContainer = document.createElement('div');
   subContainer.className = 'injectionDiv';
   container.appendChild(subContainer);
+  // 实现 dom 创建
   var svg = Blockly.createDom_(subContainer, options);
 
   // Create surfaces for dragging things. These are optimizations
@@ -77,7 +78,7 @@ Blockly.inject = function(container, opt_options) {
   var workspace = Blockly.createMainWorkspace_(svg, options, blockDragSurface,
       workspaceDragSurface);
   Blockly.setTheme(options.theme);
-
+  
   Blockly.init_(workspace);
   Blockly.mainWorkspace = workspace;
 
@@ -180,6 +181,9 @@ Blockly.createDom_ = function(container, options) {
         'k4': 0
       }, embossFilter);
   options.embossFilterId = embossFilter.id;
+  /**
+   * @doc 关于 patterns 的文档：https://developer.mozilla.org/zh-CN/docs/Web/SVG/Tutorial/Patterns
+   */
   /*
     <pattern id="blocklyDisabledPattern837493" patternUnits="userSpaceOnUse"
              width="10" height="10">
@@ -199,7 +203,7 @@ Blockly.createDom_ = function(container, options) {
   Blockly.utils.createSvgElement('path',
       {'d': 'M 0 0 L 10 10 M 10 0 L 0 10', 'stroke': '#cc0'}, disabledPattern);
   options.disabledPatternId = disabledPattern.id;
-
+  // TODO: Blockly.Grid 的作用是设置背景的栅栏
   options.gridPattern = Blockly.Grid.createDom(rnd, options.gridOptions, defs);
   return svg;
 };
@@ -343,6 +347,7 @@ Blockly.init_ = function(mainWorkspace) {
         Blockly.hideChaff(true);
         Blockly.svgResize(mainWorkspace);
       });
+  // 绑定 resize 事件
   mainWorkspace.setResizeHandlerWrapper(workspaceResizeHandler);
 
   Blockly.inject.bindDocumentEvents_();
