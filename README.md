@@ -24,3 +24,13 @@ This project is in active development and should be considered a "developer prev
   - 路径：`core/widgetdiv.js`
 - Grid
   - 路径：`core/grid.js`
+
+## 思考
+
+其实如果只是语言层面的话，Blockly 已经足够出色，但在用户交互层面，Blockly 有着不足，因为使用可视化编程本身的，一定不是计算机专业，或者是一名即将成为工程师的人。更多的是，对此有着兴趣的人，希望通过此来完成某些作品或者成就。因此，以 Scratch 为例，卡通角色则代表了用户方面的交互，来以此帮助有着兴趣的人来达成他们的作品或者成就。当然，可以思考的方向并不只有 Scratch 这种形式。是的，如果你有足够的创意，你可以用 Blockly 来完成任意的项目，与硬件相关，与动画相关，等。只是目前存在一个问题，Blockly 定制仍然是困难的，当然我所指不是语言或者程序的生成，而是 UI 制作，事件合成，和交互反馈 等一系列的问题。
+
+## 参考项目 (基于 Blockly 实现)
+
+> [pxt-blockly](https://github.com/microsoft/pxt-blockly)
+
+This is a fork of Blockly, an open source visual programming environment. The fork is maintained by the Microsoft MakeCode team, and is used to power the blocks environment in PXT.
