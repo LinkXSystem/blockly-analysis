@@ -1,4 +1,4 @@
-# Blockly 源码
+# Blockly 源码解析
 
 ## Blockly 和 Scratch
 
@@ -16,14 +16,51 @@ This project is in active development and should be considered a "developer prev
 
 ## Blockly 中的基础实体 (Class)
 
-- ToolBox
-  - 路径：`core/toolbox.js`
-- WorkSpace
-  - 路径：`core/workspace_svg.js`
-- WidgetDiv
-  - 路径：`core/widgetdiv.js`
-- Grid
-  - 路径：`core/grid.js`
+### ToolBox
+
+> 路径：`core/toolbox.js`
+
+### WorkSpace
+
+> 路径：`core/workspace_svg.js`
+
+### Connection
+
+> 路径：`core/connection.js`
+
+### ConnectionDB
+
+> 路径：`core/connection_db.js`
+
+### WidgetDiv
+
+> 路径：`core/widgetdiv.js`
+
+### Grid
+
+> 路径：`core/grid.js`
+
+### Input
+
+> 路径：`core/input.js`
+
+### Field
+
+> 路径：`code/field.js`
+
+### BlockSvg
+
+> 路径：`code/block_render_svg.js`
+
+作用：用于控制 Block 的渲染，即 Block 的 Path 的参数的生成，同时绑定 Block 的相关事件。由于 render 函数相对复杂，所以 render 函数被独立于 block_render_svg.js 中
+
+#### 内置对象及参数
+
+##### 内置对象
+
+> PathObject
+
+作用：用于记录 Block 的轮廓参数
 
 ## 思考
 
@@ -34,3 +71,7 @@ This project is in active development and should be considered a "developer prev
 > [pxt-blockly](https://github.com/microsoft/pxt-blockly)
 
 This is a fork of Blockly, an open source visual programming environment. The fork is maintained by the Microsoft MakeCode team, and is used to power the blocks environment in PXT.
+
+> [scratch-block](https://github.com/LLK/scratch-blocks)
+
+Scratch Blocks is a fork of Google's Blockly project that provides a design specification and codebase for building creative computing interfaces. Together with the Scratch Virtual Machine (VM) this codebase allows for the rapid design and development of visual programming interfaces. Unlike Blockly, Scratch Blocks does not use code generators, but rather leverages the Scratch Virtual Machine to create highly dynamic, interactive programming environments.
