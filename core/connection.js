@@ -29,7 +29,9 @@ goog.provide('Blockly.Connection');
 goog.require('Blockly.Events.BlockMove');
 goog.require('Blockly.Xml');
 
-
+/**
+ * @description 记录 Block 之间的关系
+ */
 /**
  * Class for a connection between blocks.
  * @param {!Blockly.Block} source The block establishing this connection.
@@ -53,6 +55,9 @@ Blockly.Connection = function(source, type) {
   }
 };
 
+/**
+ * @description 用于检测两个 connection 是否兼容
+ */
 /**
  * Constants for checking whether two connections are compatible.
  */
@@ -128,6 +133,9 @@ Blockly.Connection.prototype.dbOpposite_ = null;
 Blockly.Connection.prototype.hidden_ = null;
 
 /**
+ * @description 建立 Block 之间的 connection
+ */
+/**
  * Connect two connections together.  This is the connection on the superior
  * block.
  * @param {!Blockly.Connection} childConnection Connection on inferior block.
@@ -137,6 +145,7 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
   var parentConnection = this;
   var parentBlock = parentConnection.getSourceBlock();
   var childBlock = childConnection.getSourceBlock();
+  // 取消此前的 connection
   // Disconnect any existing parent on the child connection.
   if (childConnection.isConnected()) {
     childConnection.disconnect();
@@ -221,6 +230,7 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
   if (Blockly.Events.isEnabled()) {
     event = new Blockly.Events.BlockMove(childBlock);
   }
+  // 建立连接
   // Establish the connections.
   Blockly.Connection.connectReciprocally_(parentConnection, childConnection);
   // Demote the inferior block so that one is a child of the superior one.

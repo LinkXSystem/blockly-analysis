@@ -30,7 +30,9 @@ goog.require('Blockly.utils');
 
 goog.require('goog.math.Coordinate');
 
-
+/**
+ * TODO: 作用是 ?-?
+ */
 /**
  * Class for an icon.
  * @param {Blockly.Block} block The block associated with this icon.

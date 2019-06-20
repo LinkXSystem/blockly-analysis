@@ -36,7 +36,9 @@ goog.require('goog.dom');
 goog.require('goog.math.Coordinate');
 goog.require('goog.userAgent');
 
-
+/**
+ * TODO: 应该比较重要，!_!
+ */
 /**
  * Remove an attribute from a element even if it's in IE 10.
  * Similar to Element.removeAttribute() but it works on SVG elements in IE 10.

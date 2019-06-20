@@ -28,7 +28,9 @@ goog.provide('Blockly.ConnectionDB');
 
 goog.require('Blockly.Connection');
 
-
+/**
+ * @description 内存数据库，基于 Array 实现
+ */
 /**
  * Database of connections.
  * Connections are stored in order of their vertical component.  This way

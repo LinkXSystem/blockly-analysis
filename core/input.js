@@ -29,7 +29,9 @@ goog.provide('Blockly.Input');
 goog.require('Blockly.Connection');
 goog.require('Blockly.FieldLabel');
 
-
+/**
+ * @description 输入框，用于检验文本输入
+ */
 /**
  * Class for an input with an optional field.
  * @param {number} type The type of the input.

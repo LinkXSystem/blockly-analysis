@@ -40,6 +40,9 @@ goog.require('Blockly.BlockSvg');
  */
 Blockly.BlockSvg.PathObject = function() {
   /**
+   * @description 设置 Block 的主要轮廓
+   */
+  /**
    * The primary outline of the block.
    * @type {!Array.<string|number>}
    */
@@ -109,12 +112,12 @@ Blockly.BlockSvg.CORNER_RADIUS = 8;
  * Do blocks with no previous or output connections have a 'hat' on top?
  * @const
  */
-Blockly.BlockSvg.START_HAT = false;
+Blockly.BlockSvg.START_HAT = true;
 /**
  * Height of the top hat.
  * @const
  */
-Blockly.BlockSvg.START_HAT_HEIGHT = 15;
+Blockly.BlockSvg.START_HAT_HEIGHT = 50;
 /**
  * Path of the top hat's curve.
  * @const
@@ -154,11 +157,17 @@ Blockly.BlockSvg.DISTANCE_45_OUTSIDE = (1 - Math.SQRT1_2) *
  */
 Blockly.BlockSvg.NOTCH_PATH_LEFT = 'l 6,4 3,0 6,-4';
 /**
+ * @description 用于控制 \_/ 的曲线样式 
+ */
+/**
  * SVG path for drawing next/previous notch from left to right with
  * highlighting.
  * @const
  */
 Blockly.BlockSvg.NOTCH_PATH_LEFT_HIGHLIGHT = 'l 6,4 3,0 6,-4';
+/**
+ * @description 用于控制 \_/ 的曲线样式 
+ */
 /**
  * SVG path for drawing next/previous notch from right to left.
  * @const
@@ -179,6 +188,9 @@ Blockly.BlockSvg.JAGGED_TEETH_HEIGHT = 20;
  * @const
  */
 Blockly.BlockSvg.JAGGED_TEETH_WIDTH = 15;
+/**
+ * @description 用于描述左侧类似 jagged teeth (锯齿状的牙齿) 的曲线
+ */
 /**
  * SVG path for drawing a horizontal puzzle tab from top to bottom.
  * @const
@@ -310,6 +322,9 @@ Blockly.BlockSvg.prototype.getHeightWidth = function() {
 };
 
 /**
+ * @description 控制渲染的主要函数
+ */
+/**
  * Render the block.
  * Lays out and reflows a block based on its contents and settings.
  * @param {boolean=} opt_bubble If false, just render this block.
@@ -332,8 +347,9 @@ Blockly.BlockSvg.prototype.render = function(opt_bubble) {
       Blockly.BlockSvg.SEP_SPACE_X : -Blockly.BlockSvg.SEP_SPACE_X;
   // If there are no icons, cursorX will be 0, otherwise it will be the
   // width that the first label needs to move over by.
-
+  // TODO: 用于计算 Block 的宽度
   var inputRows = this.renderCompute_(cursorX);
+  // TODO: 用于计算 Block 的路径
   this.renderDraw_(cursorX, inputRows);
   this.renderMoveConnections_();
 
@@ -545,6 +561,7 @@ Blockly.BlockSvg.prototype.renderCompute_ = function(iconWidth) {
   inputRows.hasValue = hasValue;
   inputRows.hasStatement = hasStatement;
   inputRows.hasDummy = hasDummy;
+  console.warn(inputRows);
   return inputRows;
 };
 
@@ -816,6 +833,9 @@ Blockly.BlockSvg.prototype.renderDrawBottom_ = function(pathObject, cursorY) {
   }
 };
 
+/**
+ * @description 渲染左侧的边缘的数据
+ */
 /**
  * Render the left edge of the block.
  * @param {!Blockly.BlockSvg.PathObject} pathObject The object containing
