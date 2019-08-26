@@ -1978,6 +1978,9 @@ Blockly.WorkspaceSvg.prototype.clear = function() {
 };
 
 /**
+ * TODO: 注册自定义 Button 的回调事件
+ */
+/**
  * Register a callback function associated with a given key, for clicks on
  * buttons and labels in the flyout.
  * For instance, a button specified by the XML

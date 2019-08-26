@@ -476,6 +476,7 @@ Blockly.Flyout.prototype.show = function(xmlList) {
           gaps.push(default_gap);
         }
       } else if (tagName == 'BUTTON' || tagName == 'LABEL') {
+        // TODO: 在 category 注册自定义的 button 的按钮
         // Labels behave the same as buttons, but are styled differently.
         var isLabel = tagName == 'LABEL';
         var curButton = new Blockly.FlyoutButton(this.workspace_,
