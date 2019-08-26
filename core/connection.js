@@ -26,6 +26,7 @@
 
 goog.provide('Blockly.Connection');
 
+goog.require('Blockly.Events');
 goog.require('Blockly.Events.BlockMove');
 goog.require('Blockly.Xml');
 
@@ -251,8 +252,6 @@ Blockly.Connection.prototype.dispose = function() {
   if (this.inDB_) {
     this.db_.removeConnection_(this);
   }
-  this.db_ = null;
-  this.dbOpposite_ = null;
 };
 
 /**
@@ -335,7 +334,7 @@ Blockly.Connection.prototype.checkConnection_ = function(target) {
       throw Error('Target connection is null.');
     case Blockly.Connection.REASON_CHECKS_FAILED:
       var msg = 'Connection checks failed. ';
-      msg += this + ' expected '  + this.check_ + ', found ' + target.check_;
+      msg += this + ' expected ' + this.check_ + ', found ' + target.check_;
       throw Error(msg);
     case Blockly.Connection.REASON_SHADOW_PARENT:
       throw Error('Connecting non-shadow to shadow block.');
@@ -455,6 +454,10 @@ Blockly.Connection.prototype.connect = function(otherConnection) {
     return;
   }
   this.checkConnection_(otherConnection);
+  var eventGroup = Blockly.Events.getGroup();
+  if (!eventGroup) {
+    Blockly.Events.setGroup(true);
+  }
   // Determine which block is superior (higher in the source stack).
   if (this.isSuperior()) {
     // Superior block.
@@ -462,6 +465,9 @@ Blockly.Connection.prototype.connect = function(otherConnection) {
   } else {
     // Inferior block.
     otherConnection.connect_(this);
+  }
+  if (!eventGroup) {
+    Blockly.Events.setGroup(false);
   }
 };
 
@@ -552,8 +558,16 @@ Blockly.Connection.prototype.disconnect = function() {
     childBlock = this.sourceBlock_;
     parentConnection = otherConnection;
   }
+
+  var eventGroup = Blockly.Events.getGroup();
+  if (!eventGroup) {
+    Blockly.Events.setGroup(true);
+  }
   this.disconnectInternal_(parentBlock, childBlock);
   parentConnection.respawnShadow_();
+  if (!eventGroup) {
+    Blockly.Events.setGroup(false);
+  }
 };
 
 /**
@@ -666,8 +680,8 @@ Blockly.Connection.prototype.setCheck = function(check) {
 
 /**
  * Get a connection's compatibility.
- * @return {Array} List of compatible value types.  Null if
- *     all types are compatible.
+ * @return {Array} List of compatible value types.
+ *     Null if all types are compatible.
  * @public
  */
 Blockly.Connection.prototype.getCheck = function() {
@@ -684,7 +698,7 @@ Blockly.Connection.prototype.setShadowDom = function(shadow) {
 
 /**
  * Return a connection's shadow block.
- * @return {Element} shadow DOM representation of a block or null.
+ * @return {Element} Shadow DOM representation of a block or null.
  */
 Blockly.Connection.prototype.getShadowDom = function() {
   return this.shadowDom_;
@@ -698,11 +712,11 @@ Blockly.Connection.prototype.getShadowDom = function() {
  * and always return an empty list (the default).
  * {@link Blockly.RenderedConnection} overrides this behavior with a list
  * computed from the rendered positioning.
- * @param {number} maxLimit The maximum radius to another connection.
+ * @param {number} _maxLimit The maximum radius to another connection.
  * @return {!Array.<!Blockly.Connection>} List of connections.
  * @private
  */
-Blockly.Connection.prototype.neighbours_ = function(/* maxLimit */) {
+Blockly.Connection.prototype.neighbours_ = function(_maxLimit) {
   return [];
 };
 

@@ -26,8 +26,9 @@
 
 goog.provide('Blockly.Options');
 
-goog.require('Blockly.Xml');
 goog.require('Blockly.Themes.Classic');
+goog.require('Blockly.utils.userAgent');
+goog.require('Blockly.Xml');
 
 
 /**
@@ -48,7 +49,8 @@ Blockly.Options = function(options) {
     var hasDisable = false;
     var hasSounds = false;
   } else {
-    var languageTree = Blockly.Options.parseToolboxTree(options['toolbox']);
+    var languageTree =
+        Blockly.Options.parseToolboxTree(options['toolbox'] || null);
     var hasCategories = Boolean(languageTree &&
         languageTree.getElementsByTagName('category').length);
     var hasTrashcan = options['trashcan'];
@@ -100,10 +102,6 @@ Blockly.Options = function(options) {
         Blockly.TOOLBOX_AT_RIGHT : Blockly.TOOLBOX_AT_LEFT;
   }
 
-  var hasScrollbars = options['scrollbars'];
-  if (hasScrollbars === undefined) {
-    hasScrollbars = hasCategories;
-  }
   var hasCss = options['css'];
   if (hasCss === undefined) {
     hasCss = true;
@@ -120,10 +118,7 @@ Blockly.Options = function(options) {
   } else {
     var oneBasedIndex = !!options['oneBasedIndex'];
   }
-  var theme = options['theme'];
-  if (theme === undefined) {
-    theme = Blockly.Themes.Classic;
-  }
+  var theme = options['theme'] || Blockly.Themes.Classic;
 
   this.RTL = rtl;
   this.oneBasedIndex = oneBasedIndex;
@@ -135,7 +130,9 @@ Blockly.Options = function(options) {
   this.maxInstances = options['maxInstances'];
   this.pathToMedia = pathToMedia;
   this.hasCategories = hasCategories;
-  this.hasScrollbars = hasScrollbars;
+  this.moveOptions = Blockly.Options.parseMoveOptions(options, hasCategories);
+  /** @deprecated  January 2019 */
+  this.hasScrollbars = this.moveOptions.scrollbars;
   this.hasTrashcan = hasTrashcan;
   this.maxTrashcanContents = maxTrashcanContents;
   this.hasSounds = hasSounds;
@@ -167,6 +164,39 @@ Blockly.Options.prototype.setMetrics = null;
  * @return {Object} Contains size and position metrics, or null.
  */
 Blockly.Options.prototype.getMetrics = null;
+
+/**
+ * Parse the user-specified move options, using reasonable defaults where
+ *    behaviour is unspecified.
+ * @param {!Object} options Dictionary of options.
+ * @param {boolean} hasCategories Whether the workspace has categories or not.
+ * @return {!Object} A dictionary of normalized options.
+ * @private
+ */
+Blockly.Options.parseMoveOptions = function(options, hasCategories) {
+  var move = options['move'] || {};
+  var moveOptions = {};
+  if (move['scrollbars'] === undefined && options['scrollbars'] === undefined) {
+    moveOptions.scrollbars = hasCategories;
+  } else {
+    moveOptions.scrollbars = !!move['scrollbars'] || !!options['scrollbars'];
+  }
+  if (!moveOptions.scrollbars || move['wheel'] === undefined) {
+    // Defaults to false so that developers' settings don't appear to change.
+    moveOptions.wheel = false;
+  } else {
+    moveOptions.wheel = !!move['wheel'];
+  }
+  if (!moveOptions.scrollbars) {
+    moveOptions.drag = false;
+  } else if (move['drag'] === undefined) {
+    // Defaults to true if scrollbars is true.
+    moveOptions.drag = true;
+  } else {
+    moveOptions.drag = !!move['drag'];
+  }
+  return moveOptions;
+};
 
 /**
  * Parse the user-specified zoom options, using reasonable defaults where
@@ -238,11 +268,11 @@ Blockly.Options.parseGridOptions_ = function(options) {
 Blockly.Options.parseToolboxTree = function(tree) {
   if (tree) {
     if (typeof tree != 'string') {
-      if (typeof XSLTProcessor == 'undefined' && tree.outerHTML) {
+      if (Blockly.utils.userAgent.IE && tree.outerHTML) {
         // In this case the tree will not have been properly built by the
         // browser. The HTML will be contained in the element, but it will
         // not have the proper DOM structure since the browser doesn't support
-        // XSLTProcessor (XML -> HTML). This is the case in IE 9+.
+        // XSLTProcessor (XML -> HTML).
         tree = tree.outerHTML;
       } else if (!(tree instanceof Element)) {
         tree = null;
@@ -250,6 +280,9 @@ Blockly.Options.parseToolboxTree = function(tree) {
     }
     if (typeof tree == 'string') {
       tree = Blockly.Xml.textToDom(tree);
+      if (tree.nodeName.toLowerCase() != 'xml') {
+        throw TypeError('Toolbox should be an <xml> document.');
+      }
     }
   } else {
     tree = null;

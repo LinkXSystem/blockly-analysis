@@ -26,11 +26,9 @@
 
 goog.provide('Blockly.InsertionMarkerManager');
 
-goog.require('Blockly.BlockAnimations');
-goog.require('Blockly.Events.BlockMove');
+goog.require('Blockly.blockAnimations');
+goog.require('Blockly.Events');
 goog.require('Blockly.RenderedConnection');
-
-goog.require('goog.math.Coordinate');
 
 
 /**
@@ -178,7 +176,7 @@ Blockly.InsertionMarkerManager.prototype.dispose = function() {
 /**
  * Return whether the block would be deleted if dropped immediately, based on
  * information from the most recent move event.
- * @return {boolean} true if the block would be deleted if dropped immediately.
+ * @return {boolean} True if the block would be deleted if dropped immediately.
  * @package
  */
 Blockly.InsertionMarkerManager.prototype.wouldDeleteBlock = function() {
@@ -188,7 +186,8 @@ Blockly.InsertionMarkerManager.prototype.wouldDeleteBlock = function() {
 /**
  * Return whether the block would be connected if dropped immediately, based on
  * information from the most recent move event.
- * @return {boolean} true if the block would be connected if dropped immediately.
+ * @return {boolean} True if the block would be connected if dropped
+ *   immediately.
  * @package
  */
 Blockly.InsertionMarkerManager.prototype.wouldConnectBlock = function() {
@@ -213,7 +212,7 @@ Blockly.InsertionMarkerManager.prototype.applyConnections = function() {
       // Determine which connection is inferior (lower in the source stack).
       var inferiorConnection = this.localConnection_.isSuperior() ?
           this.closestConnection_ : this.localConnection_;
-      Blockly.BlockAnimations.connectionUiEffect(
+      Blockly.blockAnimations.connectionUiEffect(
           inferiorConnection.getSourceBlock());
       // Bring the just-edited stack to the front.
       var rootBlock = this.topBlock_.getRootBlock();
@@ -224,7 +223,7 @@ Blockly.InsertionMarkerManager.prototype.applyConnections = function() {
 
 /**
  * Update highlighted connections based on the most recent move location.
- * @param {!goog.math.Coordinate} dxy Position relative to drag start,
+ * @param {!Blockly.utils.Coordinate} dxy Position relative to drag start,
  *     in workspace units.
  * @param {?number} deleteArea One of {@link Blockly.DELETE_AREA_TRASH},
  *     {@link Blockly.DELETE_AREA_TOOLBOX}, or {@link Blockly.DELETE_AREA_NONE}.
@@ -263,6 +262,7 @@ Blockly.InsertionMarkerManager.prototype.createMarkerBlock_ = function(sourceBlo
   try {
     var result = this.workspace_.newBlock(imType);
     result.setInsertionMarker(true, sourceBlock.width);
+    result.setCollapsed(sourceBlock.isCollapsed());
     if (sourceBlock.mutationToDom) {
       var oldMutationDom = sourceBlock.mutationToDom();
       if (oldMutationDom) {
@@ -294,7 +294,7 @@ Blockly.InsertionMarkerManager.prototype.createMarkerBlock_ = function(sourceBlo
  * only be called once, at the beginning of a drag.
  * If the stack has more than one block, this function will populate
  * lastOnStack_ and create the corresponding insertion marker.
- * @return {!Array.<!Blockly.RenderedConnection>} a list of available
+ * @return {!Array.<!Blockly.RenderedConnection>} A list of available
  *     connections.
  * @private
  */
@@ -318,9 +318,9 @@ Blockly.InsertionMarkerManager.prototype.initAvailableConnections_ = function() 
  * updated based on the closest candidate and the current drag distance.
  * @param {!Object} candidate An object containing a local connection, a closest
  *     connection, and a radius.  Returned by getCandidate_.
- * @param {!goog.math.Coordinate} dxy Position relative to drag start,
+ * @param {!Blockly.utils.Coordinate} dxy Position relative to drag start,
  *     in workspace units.
- * @return {boolean} whether the preview should be updated.
+ * @return {boolean} Whether the preview should be updated.
  * @private
  */
 Blockly.InsertionMarkerManager.prototype.shouldUpdatePreviews_ = function(
@@ -363,9 +363,9 @@ Blockly.InsertionMarkerManager.prototype.shouldUpdatePreviews_ = function(
 /**
  * Find the nearest valid connection, which may be the same as the current
  * closest connection.
- * @param {!goog.math.Coordinate} dxy Position relative to drag start,
+ * @param {!Blockly.utils.Coordinate} dxy Position relative to drag start,
  *     in workspace units.
- * @return {!Object} candidate An object containing a local connection, a closest
+ * @return {!Object} An object containing a local connection, a closest
  *     connection, and a radius.
  */
 Blockly.InsertionMarkerManager.prototype.getCandidate_ = function(dxy) {
@@ -659,7 +659,8 @@ Blockly.InsertionMarkerManager.prototype.disconnectMarker_ = function() {
   }
 
   if (imConn.targetConnection) {
-    throw 'markerConnection_ still connected at the end of disconnectInsertionMarker';
+    throw Error('markerConnection_ still connected at the end of ' +
+        'disconnectInsertionMarker');
   }
 
   this.markerConnection_ = null;
@@ -678,8 +679,10 @@ Blockly.InsertionMarkerManager.prototype.connectMarker_ = function() {
   var imBlock = isLastInStack ? this.lastMarker_ : this.firstMarker_;
   var imConn = imBlock.getMatchingConnection(local.sourceBlock_, local);
 
-  goog.asserts.assert(imConn != this.markerConnection_,
-      'Made it to connectMarker_ even though the marker isn\'t changing');
+  if (imConn == this.markerConnection_) {
+    throw Error('Made it to connectMarker_ even though the marker isn\'t ' +
+        'changing');
+  }
 
   // Render disconnected from everything else so that we have a valid
   // connection location.

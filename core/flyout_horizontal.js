@@ -27,13 +27,10 @@
 goog.provide('Blockly.HorizontalFlyout');
 
 goog.require('Blockly.Block');
-goog.require('Blockly.Events');
-goog.require('Blockly.FlyoutButton');
 goog.require('Blockly.Flyout');
-goog.require('Blockly.WorkspaceSvg');
-
-goog.require('goog.math.Rect');
-goog.require('goog.userAgent');
+goog.require('Blockly.FlyoutButton');
+goog.require('Blockly.utils');
+goog.require('Blockly.utils.Rect');
 
 
 /**
@@ -152,10 +149,35 @@ Blockly.HorizontalFlyout.prototype.position = function() {
   var edgeHeight = this.height_ - this.CORNER_RADIUS;
   this.setBackgroundPath_(edgeWidth, edgeHeight);
 
-  var x = targetWorkspaceMetrics.absoluteLeft;
-  var y = targetWorkspaceMetrics.absoluteTop;
-  if (this.toolboxPosition_ == Blockly.TOOLBOX_AT_BOTTOM) {
-    y += (targetWorkspaceMetrics.viewHeight - this.height_);
+  // X is always 0 since this is a horizontal flyout.
+  var x = 0;
+  // If this flyout is the toolbox flyout.
+  if (this.targetWorkspace_.toolboxPosition == this.toolboxPosition_) {
+    // If there is a toolbox.
+    if (targetWorkspaceMetrics.toolboxHeight) {
+      if (this.toolboxPosition_ == Blockly.TOOLBOX_AT_TOP) {
+        var y = targetWorkspaceMetrics.toolboxHeight;
+      } else {
+        var y = targetWorkspaceMetrics.viewHeight - this.height_;
+      }
+    } else {
+      if (this.toolboxPosition_ == Blockly.TOOLBOX_AT_TOP) {
+        var y = 0;
+      } else {
+        var y = targetWorkspaceMetrics.viewHeight;
+      }
+    }
+  } else {
+    if (this.toolboxPosition_ == Blockly.TOOLBOX_AT_TOP) {
+      var y = 0;
+    } else {
+      // Because the anchor point of the flyout is on the top, but we want
+      // to align the bottom edge of the flyout with the bottom edge of the
+      // blocklyDiv, we calculate the full height of the div minus the height
+      // of the flyout.
+      var y = targetWorkspaceMetrics.viewHeight
+        + targetWorkspaceMetrics.absoluteTop - this.height_;
+    }
   }
   this.positionAt_(this.width_, this.height_, x, y);
 };
@@ -217,14 +239,10 @@ Blockly.HorizontalFlyout.prototype.scrollToStart = function() {
  * @private
  */
 Blockly.HorizontalFlyout.prototype.wheel_ = function(e) {
-  var delta = e.deltaX || e.deltaY;
+  var scrollDelta = Blockly.utils.getScrollDeltaPixels(e);
+  var delta = scrollDelta.x || scrollDelta.y;
 
   if (delta) {
-    // Firefox's mouse wheel deltas are a tenth that of Chrome/Safari.
-    // DeltaMode is 1 for a mouse wheel, but not for a trackpad scroll event
-    if (goog.userAgent.GECKO && (e.deltaMode === 1)) {
-      delta *= 10;
-    }
     var metrics = this.getMetrics_();
     var pos = metrics.viewLeft + delta;
     var limit = metrics.contentWidth - metrics.viewWidth;
@@ -294,9 +312,9 @@ Blockly.HorizontalFlyout.prototype.layout_ = function(contents, gaps) {
  * Determine if a drag delta is toward the workspace, based on the position
  * and orientation of the flyout. This is used in determineDragIntention_ to
  * determine if a new block should be created or if the flyout should scroll.
- * @param {!goog.math.Coordinate} currentDragDeltaXY How far the pointer has
+ * @param {!Blockly.utils.Coordinate} currentDragDeltaXY How far the pointer has
  *     moved from the position at mouse down, in pixel units.
- * @return {boolean} true if the drag is toward the workspace.
+ * @return {boolean} True if the drag is toward the workspace.
  * @package
  */
 Blockly.HorizontalFlyout.prototype.isDragTowardWorkspace = function(
@@ -317,7 +335,7 @@ Blockly.HorizontalFlyout.prototype.isDragTowardWorkspace = function(
 
 /**
  * Return the deletion rectangle for this flyout in viewport coordinates.
- * @return {goog.math.Rect} Rectangle in which to delete.
+ * @return {Blockly.utils.Rect} Rectangle in which to delete.
  */
 Blockly.HorizontalFlyout.prototype.getClientRect = function() {
   if (!this.svgGroup_) {
@@ -329,17 +347,14 @@ Blockly.HorizontalFlyout.prototype.getClientRect = function() {
   // area are still deleted.  Must be larger than the largest screen size,
   // but be smaller than half Number.MAX_SAFE_INTEGER (not available on IE).
   var BIG_NUM = 1000000000;
-  var y = flyoutRect.top;
-  var height = flyoutRect.height;
+  var top = flyoutRect.top;
 
   if (this.toolboxPosition_ == Blockly.TOOLBOX_AT_TOP) {
-    return new goog.math.Rect(-BIG_NUM, y - BIG_NUM, BIG_NUM * 2,
-        BIG_NUM + height);
-  } else if (this.toolboxPosition_ == Blockly.TOOLBOX_AT_BOTTOM) {
-    return new goog.math.Rect(-BIG_NUM, y, BIG_NUM * 2,
-        BIG_NUM + height);
+    var height = flyoutRect.height;
+    return new Blockly.utils.Rect(-BIG_NUM, top + height, -BIG_NUM, BIG_NUM);
+  } else {  // Bottom.
+    return new Blockly.utils.Rect(top, -BIG_NUM, -BIG_NUM, BIG_NUM);
   }
-  // TODO: Else throw error (should never happen).
 };
 
 /**

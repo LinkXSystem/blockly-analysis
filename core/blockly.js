@@ -32,6 +32,7 @@ goog.provide('Blockly');
 
 goog.require('Blockly.BlockSvg.render');
 goog.require('Blockly.Events');
+goog.require('Blockly.Events.Ui');
 goog.require('Blockly.FieldAngle');
 goog.require('Blockly.FieldCheckbox');
 goog.require('Blockly.FieldColour');
@@ -39,14 +40,15 @@ goog.require('Blockly.FieldColour');
 // Add it only if you need it.
 //goog.require('Blockly.FieldDate');
 goog.require('Blockly.FieldDropdown');
+goog.require('Blockly.FieldLabelSerializable');
 goog.require('Blockly.FieldImage');
 goog.require('Blockly.FieldTextInput');
 goog.require('Blockly.FieldNumber');
 goog.require('Blockly.FieldVariable');
 goog.require('Blockly.Generator');
-goog.require('Blockly.Msg');
 goog.require('Blockly.Procedures');
 goog.require('Blockly.Toolbox');
+goog.require('Blockly.Tooltip');
 goog.require('Blockly.Touch');
 goog.require('Blockly.WidgetDiv');
 goog.require('Blockly.WorkspaceSvg');
@@ -54,8 +56,6 @@ goog.require('Blockly.constants');
 goog.require('Blockly.inject');
 goog.require('Blockly.utils');
 goog.require('Blockly.Xml');
-
-goog.require('goog.color');
 
 
 // Turn off debugging when compiled.
@@ -107,27 +107,17 @@ Blockly.clipboardTypeCounts_ = null;
 
 /**
  * Cached value for whether 3D is supported.
- * @type {!boolean}
+ * @type {?boolean}
  * @private
  */
 Blockly.cache3dSupported_ = null;
 
 /**
  * Holds all Blockly style attributes.
- * @type {?Blockly.Theme}
+ * @type {Blockly.Theme}
  * @private
  */
 Blockly.theme_ = null;
-
-/**
- * Convert a hue (HSV model) into an RGB hex triplet.
- * @param {number} hue Hue on a colour wheel (0-360).
- * @return {string} RGB code, e.g. '#5ba65b'.
- */
-Blockly.hueToRgb = function(hue) {
-  return goog.color.hsvToHex(hue, Blockly.HSV_SATURATION,
-      Blockly.HSV_VALUE * 255);
-};
 
 /**
  * Returns the dimensions of the specified SVG image.
@@ -191,9 +181,9 @@ Blockly.svgResize = function(workspace) {
 // TODO (https://github.com/google/blockly/issues/1998) handle cases where there
 // are multiple workspaces and non-main workspaces are able to accept input.
 Blockly.onKeyDown_ = function(e) {
-  var workspace = Blockly.mainWorkspace;
-  if (workspace.options.readOnly || Blockly.utils.isTargetInput(e)
-      || (workspace.rendered && !workspace.isVisible())) {
+  var mainWorkspace = Blockly.mainWorkspace;
+  if (mainWorkspace.options.readOnly || Blockly.utils.isTargetInput(e) ||
+      (mainWorkspace.rendered && !mainWorkspace.isVisible())) {
     // No key actions on readonly workspaces.
     // When focused on an HTML text input widget, don't trap any keys.
     // Ignore keypresses on rendered workspaces that have been explicitly
@@ -211,7 +201,7 @@ Blockly.onKeyDown_ = function(e) {
     // data loss.
     e.preventDefault();
     // Don't delete while dragging.  Jeez.
-    if (workspace.isDragging()) {
+    if (Blockly.Gesture.inProgress()) {
       return;
     }
     if (Blockly.selected && Blockly.selected.isDeletable()) {
@@ -219,7 +209,7 @@ Blockly.onKeyDown_ = function(e) {
     }
   } else if (e.altKey || e.ctrlKey || e.metaKey) {
     // Don't use meta keys during drags.
-    if (workspace.isDragging()) {
+    if (Blockly.Gesture.inProgress()) {
       return;
     }
     if (Blockly.selected &&
@@ -257,7 +247,7 @@ Blockly.onKeyDown_ = function(e) {
     } else if (e.keyCode == 90) {
       // 'z' for undo 'Z' is for redo.
       Blockly.hideChaff();
-      workspace.undo(e.shiftKey);
+      mainWorkspace.undo(e.shiftKey);
     }
   }
   // Common code for delete and cut.
@@ -280,7 +270,7 @@ Blockly.copy_ = function(toCopy) {
   if (toCopy.isComment) {
     var xml = toCopy.toXmlWithXY();
   } else {
-    var xml = Blockly.Xml.blockToDom(toCopy);
+    var xml = Blockly.Xml.blockToDom(toCopy, true);
     // Copy only the selected block and internal blocks.
     Blockly.Xml.deleteNext(xml);
     // Encode start position in XML.
@@ -333,6 +323,7 @@ Blockly.onContextMenu_ = function(e) {
 Blockly.hideChaff = function(opt_allowToolbox) {
   Blockly.Tooltip.hide();
   Blockly.WidgetDiv.hide();
+  Blockly.DropDownDiv.hideWithoutAnimation();
   // For now the trashcan flyout always autocloses because it overlays the
   // trashcan UI (no trashcan to click to close it)
   var workspace = Blockly.getMainWorkspace();
@@ -381,7 +372,7 @@ Blockly.getMainWorkspace = function() {
  * @param {function()=} opt_callback The callback when the alert is dismissed.
  */
 Blockly.alert = function(message, opt_callback) {
-  window.alert(message);
+  alert(message);
   if (opt_callback) {
     opt_callback();
   }
@@ -394,7 +385,7 @@ Blockly.alert = function(message, opt_callback) {
  * @param {!function(boolean)} callback The callback for handling user response.
  */
 Blockly.confirm = function(message, callback) {
-  callback(window.confirm(message));
+  callback(confirm(message));
 };
 
 /**
@@ -407,7 +398,7 @@ Blockly.confirm = function(message, callback) {
  * @param {!function(string)} callback The callback for handling user response.
  */
 Blockly.prompt = function(message, defaultValue, callback) {
-  callback(window.prompt(message, defaultValue));
+  callback(prompt(message, defaultValue));
 };
 
 /**
@@ -466,7 +457,7 @@ Blockly.defineBlocksWithJsonArray = function(jsonArray) {
  * @param {!Function} func Function to call when event is triggered.
  * @param {boolean=} opt_noCaptureIdentifier True if triggering on this event
  *     should not block execution of other event handlers on this touch or
- *     other simultaneous touches.
+ *     other simultaneous touches.  False by default.
  * @param {boolean=} opt_noPreventDefault True if triggering on this event
  *     should prevent the default handler.  False by default.  If
  *     opt_noPreventDefault is provided, opt_noCaptureIdentifier must also be
@@ -496,7 +487,8 @@ Blockly.bindEventWithChecks_ = function(node, name, thisObject, func,
   };
 
   var bindData = [];
-  if (goog.global.PointerEvent && (name in Blockly.Touch.TOUCH_MAP)) {
+  if (Blockly.utils.global['PointerEvent'] &&
+      (name in Blockly.Touch.TOUCH_MAP)) {
     for (var i = 0, type; type = Blockly.Touch.TOUCH_MAP[name][i]; i++) {
       node.addEventListener(type, wrapFunc, false);
       bindData.push([node, type, wrapFunc]);
@@ -548,8 +540,8 @@ Blockly.bindEvent_ = function(node, name, thisObject, func) {
   };
 
   var bindData = [];
-  var window = goog.global['window'];
-  if (window && window.PointerEvent && (name in Blockly.Touch.TOUCH_MAP)) {
+  if (Blockly.utils.global['PointerEvent'] &&
+      (name in Blockly.Touch.TOUCH_MAP)) {
     for (var i = 0, type; type = Blockly.Touch.TOUCH_MAP[name][i]; i++) {
       node.addEventListener(type, wrapFunc, false);
       bindData.push([node, type, wrapFunc]);
@@ -606,6 +598,16 @@ Blockly.unbindEvent_ = function(bindData) {
  */
 Blockly.isNumber = function(str) {
   return /^\s*-?\d+(\.\d+)?\s*$/.test(str);
+};
+
+/**
+ * Convert a hue (HSV model) into an RGB hex triplet.
+ * @param {number} hue Hue on a colour wheel (0-360).
+ * @return {string} RGB code, e.g. '#5ba65b'.
+ */
+Blockly.hueToHex = function(hue) {
+  return Blockly.utils.colour.hsvToHex(hue, Blockly.HSV_SATURATION,
+      Blockly.HSV_VALUE * 255);
 };
 
 /**
@@ -682,28 +684,40 @@ Blockly.checkBlockColourConstant_ = function(
 
 
 /**
- * Sets the theme for blockly and refreshes all blocks in the toolbox and workspace.
- * @param {Blockly.Theme} theme Theme for blockly.
+ * Sets the theme for Blockly and refreshes all blocks in the toolbox and
+ * workspace.
+ * @param {!Blockly.Theme} theme Theme for Blockly.
  */
 Blockly.setTheme = function(theme) {
-  this.theme_ = theme;
+  Blockly.theme_ = theme;
   var ws = Blockly.getMainWorkspace();
 
-  //update all blocks in workspace that have a style name
-  this.updateBlockStyles_(ws.getAllBlocks().filter(
-      function(block){
+  if (ws) {
+    Blockly.refreshTheme_(ws);
+  }
+};
+
+/**
+ * Refresh the theme for all items on the workspace.
+ * @param {!Blockly.Workspace} ws Blockly workspace to refresh theme on.
+ * @private
+ */
+Blockly.refreshTheme_ = function(ws) {
+  // Update all blocks in workspace that have a style name.
+  Blockly.updateBlockStyles_(ws.getAllBlocks().filter(
+      function(block) {
         return block.getStyleName() !== undefined;
       }
   ));
 
-  //update blocks in the flyout
+  // Update blocks in the flyout.
   if (!ws.toolbox_ && ws.flyout_ && ws.flyout_.workspace_) {
-    this.updateBlockStyles_(ws.flyout_.workspace_.getAllBlocks());
+    Blockly.updateBlockStyles_(ws.flyout_.workspace_.getAllBlocks());
   } else {
     ws.refreshToolboxSelection();
   }
 
-  //update colours on the categories
+  // Update colours on the categories.
   if (ws.toolbox_) {
     ws.toolbox_.updateColourFromTheme();
   }
@@ -715,14 +729,13 @@ Blockly.setTheme = function(theme) {
 
 /**
  * Updates all the blocks with new style.
- * @param {!Array.<Blockly.Block>} blocks List of blocks to update the style on.
+ * @param {!Array.<!Blockly.Block>} blocks List of blocks to update the style
+ * on.
  * @private
  */
 Blockly.updateBlockStyles_ = function(blocks) {
-  for (var i = 0; i < blocks.length; i++) {
-    var block = blocks[i];
+  for (var i = 0, block; block = blocks[i]; i++) {
     var blockStyleName = block.getStyleName();
-
     block.setStyle(blockStyleName);
     if (block.mutator) {
       block.mutator.updateBlockStyle(blockStyleName);
@@ -732,23 +745,16 @@ Blockly.updateBlockStyles_ = function(blocks) {
 
 /**
  * Gets the theme.
- * @return {?Blockly.Theme} theme Theme for blockly.
+ * @return {Blockly.Theme} Theme for Blockly.
  */
 Blockly.getTheme = function() {
-  return this.theme_;
+  return Blockly.theme_;
 };
 
-// IE9 does not have a console.  Create a stub to stop errors.
-if (!goog.global['console']) {
-  goog.global['console'] = {
-    'log': function() {},
-    'warn': function() {}
-  };
-}
-
 // Export symbols that would otherwise be renamed by Closure compiler.
-if (!goog.global['Blockly']) {
-  goog.global['Blockly'] = {};
+if (!Blockly.utils.global['Blockly']) {
+  Blockly.utils.global['Blockly'] = {};
 }
-goog.global['Blockly']['getMainWorkspace'] = Blockly.getMainWorkspace;
-goog.global['Blockly']['addChangeListener'] = Blockly.addChangeListener;
+Blockly.utils.global['Blockly']['getMainWorkspace'] = Blockly.getMainWorkspace;
+Blockly.utils.global['Blockly']['addChangeListener'] =
+    Blockly.addChangeListener;
