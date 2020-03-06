@@ -408,6 +408,8 @@ Blockly.prompt = function(message, defaultValue, callback) {
  * @return {function()} A function that calls jsonInit with the correct value
  *     of jsonDef.
  * @private
+ * 
+ * TODO: 声明 Block
  */
 Blockly.jsonInitFactory_ = function(jsonDef) {
   return function() {
@@ -419,6 +421,8 @@ Blockly.jsonInitFactory_ = function(jsonDef) {
  * Define blocks from an array of JSON block definitions, as might be generated
  * by the Blockly Developer Tools.
  * @param {!Array.<!Object>} jsonArray An array of JSON block definitions.
+ * 
+ * TODO: 批量定义 Block
  */
 Blockly.defineBlocksWithJsonArray = function(jsonArray) {
   for (var i = 0; i < jsonArray.length; i++) {

@@ -1630,6 +1630,7 @@ Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
               input = this.appendDummyInput(element['name']);
               break;
             default:
+              // TODO: 注册 field
               field = Blockly.Field.fromJson(element);
 
               // Unknown field.

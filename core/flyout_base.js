@@ -372,6 +372,7 @@ Blockly.Flyout.prototype.updateDisplay_ = function() {
  * @protected
  */
 Blockly.Flyout.prototype.positionAt_ = function(width, height, x, y) {
+  //TODO:
   this.svgGroup_.setAttribute("width", width);
   this.svgGroup_.setAttribute("height", height);
   if (this.svgGroup_.tagName == 'svg') {

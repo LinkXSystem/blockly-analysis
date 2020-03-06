@@ -37,8 +37,8 @@ goog.require('Blockly.utils.base');
 goog.require('Blockly.utils.Coordinate');
 goog.require('Blockly.utils.string');
 goog.require('Blockly.utils.userAgent');
+goog.require('goog.style');
 
-<<<<<<< HEAD
 /**
  * TODO: 应该比较重要，!_!
  */
@@ -128,10 +128,6 @@ Blockly.utils.hasClass = function(element, className) {
 Blockly.utils.removeNode = function(node) {
   return node && node.parentNode ? node.parentNode.removeChild(node) : null;
 };
-=======
-goog.require('goog.style');
-
->>>>>>> 4efa0dad1f2c882234759d3ba7ecd0ebd95a4c77
 
 /**
  * Don't do anything for this event, just halt propagation.

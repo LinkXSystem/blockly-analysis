@@ -371,6 +371,7 @@ Blockly.Scrollbar.prototype.setHandleLength_ = function(newLength) {
  * @param {number} newPosition The new scrollbar handle offset in CSS pixels.
  */
 Blockly.Scrollbar.prototype.setHandlePosition = function(newPosition) {
+  console.warn()
   this.handlePosition_ = newPosition;
   this.svgHandle_.setAttribute(this.positionAttribute_, this.handlePosition_);
 };

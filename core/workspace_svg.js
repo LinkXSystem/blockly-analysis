@@ -2162,7 +2162,7 @@ Blockly.WorkspaceSvg.getTopLevelWorkspaceMetrics_ = function() {
     contentHeight: contentDimensions.height,
     contentWidth: contentDimensions.width,
     contentTop: contentDimensions.top,
-    contentLeft: contentDimensions.left,
+    contentLeft: 0,
 
     viewHeight: viewSize.height,
     viewWidth: viewSize.width,
@@ -2170,7 +2170,7 @@ Blockly.WorkspaceSvg.getTopLevelWorkspaceMetrics_ = function() {
     viewLeft: -this.scrollX,
 
     absoluteTop: absoluteTop,
-    absoluteLeft: absoluteLeft,
+    absoluteLeft: 0,
 
     svgHeight: svgSize.height,
     svgWidth: svgSize.width,

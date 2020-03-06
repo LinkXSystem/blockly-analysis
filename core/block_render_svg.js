@@ -118,7 +118,7 @@ Blockly.BlockSvg.START_HAT = true;
  * Height of the top hat.
  * @const
  */
-Blockly.BlockSvg.START_HAT_HEIGHT = 50;
+Blockly.BlockSvg.START_HAT_HEIGHT = 25;
 /**
  * Path of the top hat's curve.
  * @const
@@ -498,6 +498,7 @@ Blockly.BlockSvg.prototype.renderCompute_ = function(iconWidth) {
       input.fieldWidth += this.RTL ? -iconWidth : iconWidth;
     }
     var previousFieldEditable = false;
+    // TODO: Input 框的长度
     for (var j = 0, field; field = input.fieldRow[j]; j++) {
       if (j != 0) {
         input.fieldWidth += Blockly.BlockSvg.SEP_SPACE_X;
